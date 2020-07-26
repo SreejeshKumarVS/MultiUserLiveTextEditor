@@ -1,0 +1,89 @@
+body, html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#mouse-div {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background:red;
+}
+text = text: ''
+
+$(window).on 'load', ->
+    socket = io.connect('https://realtime-editor-endpoint.herokuapp.com/' or 'http://localhost:8080')
+    $('#text').on 'froalaEditor.keyup', ->
+        html = $(this).froalaEditor('html.get')
+        data = text: html
+        socket.emit 'text', data
+        return
+    $('#text').froalaEditor
+        toolbarButtons: [
+            'fullscreen'
+            'bold'
+            'italic'
+            'underline'
+            'strikeThrough'
+            'subscript'
+            'superscript'
+            '|'
+            'fontFamily'
+            'fontSize'
+            'color'
+            'inlineStyle'
+            'paragraphStyle'
+            '|'
+            'paragraphFormat'
+            'align'
+            'formatOL'
+            'formatUL'
+            'outdent'
+            'indent'
+            'quote'
+            '-'
+            'insertLink'
+            'insertImage'
+            'insertVideo'
+            'insertFile'
+            'insertTable'
+            '|'
+            'emoticons'
+            'specialCharacters'
+            'insertHR'
+            'selectAll'
+            'clearFormatting'
+            '|'
+            'print'
+            'help'
+            'html'
+            '|'
+            'undo'
+            'redo'
+        ]
+        fullPage: true
+    socket.on 'text', handleRecievedText
+    socket.on 'newUser', updateText
+    return
+
+updateText = (data) ->
+    text.text = data.text
+    $('#text').froalaEditor 'html.set', data.text
+    editor = $('#text').data('froala.editor')
+    editor.selection.setAtEnd editor.$el.get(0)
+    editor.selection.restore()
+    return
+
+handleRecievedText = (data) ->
+    console.log data
+    text.text = data.text
+    $('#text').froalaEditor 'html.set', data.text
+    editor = $('#text').data('froala.editor')
+    editor.selection.setAtEnd editor.$el.get(0)
+    editor.selection.restore()
+    return
